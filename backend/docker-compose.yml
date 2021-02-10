@@ -1,0 +1,15 @@
+version: "3.3"
+services:
+  db:
+    image: "mysql:5.7"
+    environment:
+      - "MYSQL_ROOT_PASSWORD=squad"
+    volumes: 
+      - "${PWD}/db/mysql.conf.d:/etc/mysql/conf.d/"
+      - "${PWD}/db/data:/var/lib/mysql"
+    ports:
+      - 3306:3306
+  squad-backend:
+    build: "."
+    links:
+      - db:db
