@@ -26,7 +26,7 @@ public class UserService {
 	
 	@GetMapping("/user/{id}")
 	public User getUser(@PathVariable long id) {
-		return repository.getOne(id);
+		return repository.findById(id).orElseThrow();
 	}	
 
 	@GetMapping("/users")
