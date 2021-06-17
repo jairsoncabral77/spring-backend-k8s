@@ -18,13 +18,13 @@ public class UserService {
 	@Autowired
 	private UserRepository repository;
 
-	@PostMapping("/user")
+	@PostMapping("/users")
 	public User addUser(@RequestBody User user) {
 		repository.save(user);
 		return user;
 	}
 	
-	@GetMapping("/user/{id}")
+	@GetMapping("/users/{id}")
 	public User getUser(@PathVariable long id) {
 		return repository.findById(id).orElseThrow();
 	}	

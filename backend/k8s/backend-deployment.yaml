@@ -1,0 +1,56 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: squad-api
+  labels:
+    app: squad
+    tier: backend
+spec:
+  selector:
+    app: squad
+    tier: backend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squad-api
+  labels:
+    app: squad
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: squad
+      tier: backend
+  template:
+    metadata:
+      labels:
+        app: squad
+        tier: backend
+    spec:
+      containers:
+      - name: squad-backend
+        image: 655059429848.dkr.ecr.us-east-1.amazonaws.com/jairsoncabral:squad-1.1
+        env:
+        - name: DB_HOST
+          value: "squad-database.default"
+        - name: DB_PORT
+          value: "3306"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: squad-mysql-pass
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: squad-mysql-pass
+              key: password
+        ports:
+        - containerPort: 8080

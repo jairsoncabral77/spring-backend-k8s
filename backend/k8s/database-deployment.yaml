@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: squad-database
+  labels:
+    app: squad
+    tier: data
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: squad
+    tier: data
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pv-claim
+  labels:
+    app: squad
+    tier: data
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: squad-database
+  labels:
+    app: squad
+    tier: data
+spec:
+  selector:
+    matchLabels:
+      app: squad
+      tier: data
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: squad
+        tier: data
+    spec:
+      containers:
+      - image: mysql:8
+        name: squad-mysql
+        env:
+        - name: MYSQL_DATABASE
+          value: "squad"
+        - name: MYSQL_ROOT_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: squad-mysql-pass
+              key: password
+        ports:
+        - containerPort: 3306
+          name: mysql
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+        - name: initdb
+          mountPath: /docker-entrypoint-initdb.d
+      volumes:
+      - name: mysql-persistent-storage
+        persistentVolumeClaim:
+          claimName: mysql-pv-claim
+      - name: initdb
+        configMap:
+          name: squad-initdb-config
