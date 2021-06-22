@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: squad-database
+  labels:
+    app: squad
+    tier: data
+spec:
+  ports:
+    - port: 3306
+  selector:
+    app: squad
+    tier: data
+  clusterIP: None

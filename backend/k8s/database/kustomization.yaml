@@ -1,0 +1,8 @@
+resources:
+- deployment.yaml
+- service.yaml
+- volume.yaml
+configMapGenerator:
+- name: initdb-configmap
+  files:
+  - init.sql
